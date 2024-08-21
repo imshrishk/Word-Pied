@@ -6,20 +6,20 @@ const WritingBox = ({ boxNumber }) => {
   const [text, setText] = useState('');
 
   useEffect(() => {
-    // Firebase Realtime Database reference for this specific box
+    // Reference to this specific box in Firebase
     const boxRef = ref(database, `boxes/${boxNumber}`);
 
-    // Function to handle incoming data from Firebase
+    // This function will be called whenever the data in Firebase changes
     const updateText = (snapshot) => {
       const data = snapshot.val();
       if (data !== null) {
         setText(data);
-        // Optionally, update localStorage for offline capability or initial load
+        // Optionally update localStorage for offline or initial load purposes
         localStorage.setItem(`boxText_${boxNumber}`, data);
       }
     };
 
-    // Initial load from localStorage or set default empty string
+    // Initial load from localStorage or set default
     const localText = localStorage.getItem(`boxText_${boxNumber}`);
     if (localText) {
       setText(localText);
@@ -27,21 +27,23 @@ const WritingBox = ({ boxNumber }) => {
       setText('');
     }
 
-    // Listen for changes in Firebase
-    const unsubscribe = onValue(boxRef, updateText);
+    // Subscribe to changes in the specific box in Firebase
+    const boxUnsubscribe = onValue(boxRef, updateText);
 
-    // Clean up listener on component unmount
-    return () => unsubscribe();
+    // Cleanup function to unsubscribe from Firebase when component unmounts
+    return () => {
+      boxUnsubscribe();
+    };
   }, [boxNumber]);
 
   const handleChange = (e) => {
     const newText = e.target.value;
     setText(newText);
 
-    // Update Firebase with the new text
+    // Update Firebase with the new text for the specific box
     set(ref(database, `boxes/${boxNumber}`), newText);
-    
-    // Optionally, update localStorage
+
+    // Optionally update localStorage
     localStorage.setItem(`boxText_${boxNumber}`, newText);
   };
 

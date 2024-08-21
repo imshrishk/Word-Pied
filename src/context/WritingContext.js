@@ -1,4 +1,3 @@
-// In WritingContext.js
 import React, { createContext, useContext, useState } from 'react';
 import api from '../utils/api';
 

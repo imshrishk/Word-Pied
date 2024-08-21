@@ -1,4 +1,3 @@
-// src/pages/_app.js
 import { WritingProvider } from '../context/WritingContext';
 
 function MyApp({ Component, pageProps }) {

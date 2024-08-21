@@ -1,4 +1,3 @@
-// In a file like `pages/api/websocket.js`
 import { WebSocketServer } from 'ws';
 
 export default function handler(req, res) {
