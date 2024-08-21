@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
-
-const socket = io("https://words-pied.vercel.app"); // Connect to the WebSocket server
+import { ref, onValue, set } from 'firebase/database';
+import { database } from '../firebase';
 
 const WritingBox = ({ id }) => {
   const [text, setText] = useState('');
 
   useEffect(() => {
-    // Listen for updates from other users
-    socket.on('updateText', (data) => {
-      if (data.id === id) {
-        setText(data.text);
+    const textRef = ref(database, `texts/${id}`);
+
+    onValue(textRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setText(data);
       }
     });
-
-    return () => socket.off('updateText'); // Cleanup on component unmount
   }, [id]);
 
   const handleTextChange = (e) => {
     const newText = e.target.value;
     setText(newText);
-    socket.emit('textChange', { id, text: newText });
+    set(ref(database, `texts/${id}`), newText);
   };
 
   return <textarea value={text} onChange={handleTextChange} placeholder={`Write here... ${id}`} rows="4" />;
