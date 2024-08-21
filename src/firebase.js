@@ -1,5 +1,6 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
+import { getDatabase } from "firebase/database";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -13,11 +14,21 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
+// Ensure all necessary fields are defined
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  throw new Error("Missing Firebase configuration values");
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+// Initialize Realtime Database
+export const database = getDatabase(app);
+
 // Conditionally initialize Analytics
 let analytics;
-if (typeof window !== 'undefined' && isSupported()) {
-  analytics = getAnalytics(app);
-}
+(async () => {
+  if (typeof window !== 'undefined' && await isSupported()) {
+    analytics = getAnalytics(app);
+  }
+})();
