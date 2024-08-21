@@ -1,0 +1,297 @@
+.homeContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f5f7fa, #8baadc);
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+    transition: background 0.3s, color 0.3s;
+    animation: fadeIn 1s ease-out;
+}
+
+.darkMode {
+    background: linear-gradient(135deg, #9f9f9f, #333);
+    color: #565151;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 1rem;
+    animation: slideIn 1s ease-out;
+}
+
+.homeTitle {
+    font-family: 'Roboto', sans-serif;
+    font-size: 3rem;
+    color: #333;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease-out;
+}
+
+.neonText {
+    color: #ffffff;
+    font-size: 3rem;
+    font-family: 'Arial', sans-serif;
+    animation: neonGlow 1.5s infinite alternate;
+}
+
+.darkMode .homeTitle {
+    color: #e0e0e0;
+}
+
+.darkModeToggle {
+    background-color: #342f2f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.darkModeToggle:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.subtitle {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 2rem;
+    animation: slideUp 1s ease-out;
+}
+
+.darkMode .subtitle {
+    color: #e0e0e0;
+}
+
+.writingBoxesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    max-width: 1200px;
+    animation: fadeIn 1s ease-out;
+}
+
+.writingBoxContainer {
+    position: relative;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.darkMode .writingBoxContainer {
+    background: #2c2c2c;
+    box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.writingBoxContainer:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.2);
+    animation: swing 0.5s ease-out;
+}
+
+.boxLabel {
+    display: block;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    color: #007bff;
+    margin-bottom: 0.5rem;
+    transition: color 0.3s;
+    animation: fadeIn 1s ease-out;
+}
+
+.darkMode .boxLabel {
+    color: #4f9aff;
+}
+
+.writingBox {
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    padding: 12px;
+    width: 100%;
+    min-height: 200px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    background-color: #f9f9f9;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.scrollButton {
+    position: fixed;
+    bottom: 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    font-size: 1.5rem;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.scrollToTop {
+    right: 20px;
+}
+
+.scrollToBottom {
+    right: 80px;
+}
+
+.scrollButton:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+}
+
+.confettiButton {
+    background: #15bb83;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.confettiButton:hover {
+    background: #ff6f00;
+}
+
+.floatingElement {
+    position: absolute;
+    font-size: 2rem;
+    pointer-events: none;
+    z-index: 10;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(1);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes swing {
+    0% {
+        transform: rotate(0deg);
+    }
+    40% {
+        transform: rotate(1deg);
+    }
+    80% {
+        transform: rotate(-1deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes neonGlow {
+    from {
+        text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ff00ff, 0 0 40px #ff00ff, 0 0 50px #ff00ff, 0 0 60px #ff00ff, 0 0 70px #ff00ff;
+    }
+    to {
+        text-shadow: 0 0 20px #ffffff, 0 0 30px #ffffff, 0 0 40px #ff00ff, 0 0 50px #ff00ff, 0 0 60px #ff00ff, 0 0 70px #ff00ff, 0 0 80px #ff00ff;
+    }
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    animation: confettiFall 2s ease-out;
+}
+
+@keyframes confettiFall {
+    to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+.scrollAnimation {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+.scrollAnimation.visible {
+    opacity: 1;
+}
+
+.musicToggle {
+    background-color: #c0d258;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.musicToggle:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}

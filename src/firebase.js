@@ -1,5 +1,6 @@
 import { initializeApp, getApp, getApps } from 'firebase/app';
-import { getDatabase } from 'firebase/database'; // Import this if you're using the Realtime Database
+import { getDatabase } from 'firebase/database'; // Import for Realtime Database
+import { getStorage } from 'firebase/storage'; // Import for Firebase Storage
 
 // Your web app's Firebase configuration using environment variables
 const firebaseConfig = {
@@ -15,6 +16,7 @@ const firebaseConfig = {
 
 // Initialize Firebase only if it hasn't been initialized already
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-export const database = getDatabase(app); // Initialize Realtime Database if needed
+export const database = getDatabase(app); // Initialize Realtime Database
+export const storage = getStorage(app); // Initialize Firebase Storage
 
 export default app;

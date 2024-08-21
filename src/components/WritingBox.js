@@ -1,58 +1,85 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { ref, onValue, set } from 'firebase/database';
 import { database } from '../firebase';
+import styles from './WritingBox.module.css';
 
 const WritingBox = ({ boxNumber }) => {
-  const [text, setText] = useState('');
+  const [htmlContent, setHtmlContent] = useState('');
+  const textboxRef = useRef(null);
 
   useEffect(() => {
-    // Reference to this specific box in Firebase
     const boxRef = ref(database, `boxes/${boxNumber}`);
 
-    // This function will be called whenever the data in Firebase changes
     const updateText = (snapshot) => {
       const data = snapshot.val();
       if (data !== null) {
-        setText(data);
-        // Optionally update localStorage for offline or initial load purposes
+        setHtmlContent(data);
         localStorage.setItem(`boxText_${boxNumber}`, data);
       }
     };
 
-    // Initial load from localStorage or set default
     const localText = localStorage.getItem(`boxText_${boxNumber}`);
     if (localText) {
-      setText(localText);
+      setHtmlContent(localText);
     } else {
-      setText('');
+      setHtmlContent('');
     }
 
-    // Subscribe to changes in the specific box in Firebase
     const boxUnsubscribe = onValue(boxRef, updateText);
 
-    // Cleanup function to unsubscribe from Firebase when component unmounts
     return () => {
       boxUnsubscribe();
     };
   }, [boxNumber]);
 
-  const handleChange = (e) => {
-    const newText = e.target.value;
-    setText(newText);
+  const handleBlur = () => {
+    const newContent = textboxRef.current.innerHTML; // Use innerHTML to get full HTML content
+    setHtmlContent(newContent);
 
-    // Update Firebase with the new text for the specific box
-    set(ref(database, `boxes/${boxNumber}`), newText);
+    set(ref(database, `boxes/${boxNumber}`), newContent);
+    localStorage.setItem(`boxText_${boxNumber}`, newContent);
+  };
 
-    // Optionally update localStorage
-    localStorage.setItem(`boxText_${boxNumber}`, newText);
+  const handleMouseUp = () => {
+    const selection = window.getSelection();
+    if (selection.toString().length > 0) {
+      const url = prompt('Enter the URL for the link:');
+      if (url) {
+        let validUrl = url;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          validUrl = `https://${url}`;
+        }
+
+        const anchor = document.createElement('a');
+        anchor.href = validUrl;
+        anchor.textContent = selection.toString();
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(anchor);
+
+        // Instead of calling handleInput here, we'll manually update the text
+        const newContent = textboxRef.current.innerHTML;
+        setHtmlContent(newContent);
+        set(ref(database, `boxes/${boxNumber}`), newContent);
+        localStorage.setItem(`boxText_${boxNumber}`, newContent);
+        selection.removeAllRanges();
+      }
+    }
   };
 
   return (
-    <textarea
-      value={text}
-      onChange={handleChange}
+    <div
+      className={styles.writingBox}
+      contentEditable
+      ref={textboxRef}
+      onBlur={handleBlur}
+      onMouseUp={handleMouseUp}
       placeholder={`Box ${boxNumber} - Start writing...`}
       data-box-number={boxNumber}
+      dangerouslySetInnerHTML={{ __html: htmlContent }} // Use dangerouslySetInnerHTML to set HTML content
     />
   );
 };
