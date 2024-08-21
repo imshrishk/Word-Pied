@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
-const socket = io(); // Connect to the WebSocket server
+const socket = io("https://words-pied.vercel.app"); // Connect to the WebSocket server
 
 const WritingBox = ({ id }) => {
   const [text, setText] = useState('');
