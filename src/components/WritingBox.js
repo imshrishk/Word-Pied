@@ -12,11 +12,11 @@ const WritingBox = ({ id }) => {
       setText(savedText);
     }
 
-    // Firebase Realtime Database reference
+    // Firebase Realtime Database reference for this specific box
     const textRef = ref(database, `texts/${id}`);
 
     // Listen for changes in Firebase
-    onValue(textRef, (snapshot) => {
+    const unsubscribe = onValue(textRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
         setText(data);
@@ -24,6 +24,9 @@ const WritingBox = ({ id }) => {
         localStorage.setItem(`texts_${id}`, data);
       }
     });
+
+    // Cleanup listener on component unmount
+    return () => unsubscribe();
   }, [id]);
 
   const handleChange = (e) => {
