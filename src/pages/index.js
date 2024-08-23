@@ -141,6 +141,8 @@ export default function Home() {
       </header>
 
       <p className={`${styles.subtitle} ${styles.slideUp}`}>Write and add links for the world to find!!!</p>
+      <p className={`${styles.subtitle} ${styles.slideUp}`}>Music changes everytime you refresh and you can embed links(Works better on PC)</p>
+      <p className={`${styles.subtitle} ${styles.slideUp}`}>Please let everyone have fun and don't clear others stuff. Thx.</p>
 
       <div className={`${styles.writingBoxesGrid} ${styles.borderPulse}`}>
         {Array.from({ length: 999 }, (_, i) => i).map(boxNumber => (
