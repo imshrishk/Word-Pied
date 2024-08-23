@@ -7,6 +7,8 @@ const WritingBox = ({ boxNumber }) => {
   const [htmlContent, setHtmlContent] = useState('');
   const textboxRef = useRef(null);
   const [dynamicClass, setDynamicClass] = useState(generateDynamicClass());
+  const [showLinkButton, setShowLinkButton] = useState(false);
+  const [selectionRange, setSelectionRange] = useState(null);
 
   useEffect(() => {
     const boxRef = ref(database, `boxes/${boxNumber}`);
@@ -28,6 +30,10 @@ const WritingBox = ({ boxNumber }) => {
     }
 
     const boxUnsubscribe = onValue(boxRef, updateText);
+
+    return () => {
+      boxUnsubscribe();
+    };
   }, [boxNumber]);
 
   const handleBlur = () => {
@@ -39,51 +45,58 @@ const WritingBox = ({ boxNumber }) => {
     localStorage.setItem(`boxText_${boxNumber}`, encodedContent);
   };
 
-  const addLink = () => {
+  const handleMouseUp = () => {
     const selection = window.getSelection();
     if (selection.toString().length > 0) {
-      const url = prompt('Enter the URL for the link:');
-      if (url) {
-        let validUrl = url;
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          validUrl = `https://${url}`;
-        }
-
-        const anchor = document.createElement('a');
-        anchor.href = validUrl;
-        anchor.textContent = selection.toString();
-        anchor.target = '_blank';
-        anchor.rel = 'noopener noreferrer';
-
-        const range = selection.getRangeAt(0);
-        range.deleteContents();
-        range.insertNode(anchor);
-
-        const newContent = textboxRef.current.innerHTML;
-        setHtmlContent(newContent);
-        set(ref(database, `boxes/${boxNumber}`), safeEncodeContent(newContent));
-        localStorage.setItem(`boxText_${boxNumber}`, safeEncodeContent(newContent));
-        selection.removeAllRanges();
-      }
+      setShowLinkButton(true);
+      setSelectionRange(selection.getRangeAt(0));
     } else {
-      alert('Please select text to add a link.');
+      setShowLinkButton(false);
+    }
+  };
+
+  const addLink = () => {
+    const url = prompt('Enter the URL for the link:');
+    if (url && selectionRange) {
+      let validUrl = url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        validUrl = `https://${url}`;
+      }
+
+      const anchor = document.createElement('a');
+      anchor.href = validUrl;
+      anchor.textContent = selectionRange.toString();
+      anchor.target = '_blank';
+      anchor.rel = 'noopener noreferrer';
+
+      selectionRange.deleteContents();
+      selectionRange.insertNode(anchor);
+
+      const newContent = textboxRef.current.innerHTML;
+      setHtmlContent(newContent);
+      set(ref(database, `boxes/${boxNumber}`), safeEncodeContent(newContent));
+      localStorage.setItem(`boxText_${boxNumber}`, safeEncodeContent(newContent));
+      setShowLinkButton(false);
     }
   };
 
   return (
-    <div className={styles.writingBoxWrapper}>
+    <div className={styles.container}>
       <div
         className={`${styles.writingBox} ${dynamicClass}`}
         contentEditable
         ref={textboxRef}
         onBlur={handleBlur}
+        onMouseUp={handleMouseUp}
         placeholder={`Box ${boxNumber} - Start writing...`}
         data-box-number={boxNumber}
         dangerouslySetInnerHTML={{ __html: htmlContent }}
       />
-      <button className={styles.addLinkButton} onClick={addLink}>
-        Add Link
-      </button>
+      {showLinkButton && (
+        <button className={styles.linkButton} onClick={addLink}>
+          Add Link
+        </button>
+      )}
     </div>
   );
 };
