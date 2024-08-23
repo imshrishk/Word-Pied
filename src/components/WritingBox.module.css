@@ -30,18 +30,25 @@
     text-decoration: underline;
   }
   
-  .linkButton {
-    margin-top: 10px;
-    padding: 5px 10px;
+  .writingBoxWrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .addLinkButton {
+    margin-top: 8px;
+    padding: 8px;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-size: 16px;
+    text-align: center;
   }
   
-  .linkButton:hover {
+  .addLinkButton:hover {
     background-color: #0056b3;
   }
   

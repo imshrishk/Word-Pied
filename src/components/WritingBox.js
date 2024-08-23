@@ -28,27 +28,6 @@ const WritingBox = ({ boxNumber }) => {
     }
 
     const boxUnsubscribe = onValue(boxRef, updateText);
-
-    // Disable right-click and key combinations to open dev tools
-    const disableRightClick = (e) => e.preventDefault();
-    const disableDevTools = (e) => {
-      if (
-        e.keyCode === 123 || // F12
-        (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
-        (e.ctrlKey && e.keyCode === 85) // Ctrl+U
-      ) {
-        e.preventDefault();
-      }
-    };
-
-    document.addEventListener('contextmenu', disableRightClick);
-    document.addEventListener('keydown', disableDevTools);
-
-    return () => {
-      boxUnsubscribe();
-      document.removeEventListener('contextmenu', disableRightClick);
-      document.removeEventListener('keydown', disableDevTools);
-    };
   }, [boxNumber]);
 
   const handleBlur = () => {
@@ -60,7 +39,7 @@ const WritingBox = ({ boxNumber }) => {
     localStorage.setItem(`boxText_${boxNumber}`, encodedContent);
   };
 
-  const handleMouseUp = () => {
+  const addLink = () => {
     const selection = window.getSelection();
     if (selection.toString().length > 0) {
       const url = prompt('Enter the URL for the link:');
@@ -86,20 +65,26 @@ const WritingBox = ({ boxNumber }) => {
         localStorage.setItem(`boxText_${boxNumber}`, safeEncodeContent(newContent));
         selection.removeAllRanges();
       }
+    } else {
+      alert('Please select text to add a link.');
     }
   };
 
   return (
-    <div
-      className={`${styles.writingBox} ${dynamicClass}`}
-      contentEditable
-      ref={textboxRef}
-      onBlur={handleBlur}
-      onMouseUp={handleMouseUp}
-      placeholder={`Box ${boxNumber} - Start writing...`}
-      data-box-number={boxNumber}
-      dangerouslySetInnerHTML={{ __html: htmlContent }}
-    />
+    <div className={styles.writingBoxWrapper}>
+      <div
+        className={`${styles.writingBox} ${dynamicClass}`}
+        contentEditable
+        ref={textboxRef}
+        onBlur={handleBlur}
+        placeholder={`Box ${boxNumber} - Start writing...`}
+        data-box-number={boxNumber}
+        dangerouslySetInnerHTML={{ __html: htmlContent }}
+      />
+      <button className={styles.addLinkButton} onClick={addLink}>
+        Add Link
+      </button>
+    </div>
   );
 };
 
