@@ -1,12 +1,15 @@
 import React from 'react';
 import { WritingProvider } from '../context/WritingContext';
-import '../styles/global.css'; // Import global styles here
+import { ThemeProvider } from 'next-themes';
+import '../styles/global.css';
 
 function MyApp({ Component, pageProps }) {
   return (
-    <WritingProvider>
-      <Component {...pageProps} />
-    </WritingProvider>
+    <ThemeProvider attribute="class">
+      <WritingProvider>
+        <Component {...pageProps} />
+      </WritingProvider>
+    </ThemeProvider>
   );
 }
 

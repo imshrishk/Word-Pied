@@ -1,34 +1,51 @@
-import React, { createContext, useContext, useState } from 'react';
-import api from '../utils/api';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { ref, onValue } from 'firebase/database';
+import { database } from '../firebase';
 
-const WritingContext = createContext({
-  submitWriting: async () => {
-    console.error('Default submitWriting function called. Context not properly set up.');
-  }
-});
+const WritingContext = createContext();
 
-export const WritingProvider = ({ children }) => {
-  const [state, setState] = useState({});
+export function useWriting() {
+  return useContext(WritingContext);
+}
 
-  const submitWriting = async (data) => {
-    try {
-      await api.post(process.env.API_ENDPOINT, data);
-    } catch (error) {
-      console.error('Failed to submit writing:', error);
-    }
+export function WritingProvider({ children }) {
+  const [boxes, setBoxes] = useState({});
+  const [boxMeta, setBoxMeta] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const boxesRef = ref(database, 'boxes');
+    const boxesUnsubscribe = onValue(boxesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setBoxes(data);
+      }
+      setLoading(false);
+    });
+
+    const metaRef = ref(database, 'boxMeta');
+    const metaUnsubscribe = onValue(metaRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        setBoxMeta(data);
+      }
+    });
+
+    return () => {
+      boxesUnsubscribe();
+      metaUnsubscribe();
+    };
+  }, []);
+
+  const value = {
+    boxes,
+    boxMeta,
+    loading
   };
 
   return (
-    <WritingContext.Provider value={{ submitWriting, state }}>
+    <WritingContext.Provider value={value}>
       {children}
     </WritingContext.Provider>
   );
-};
-
-export const useWritingContext = () => {
-  const context = useContext(WritingContext);
-  if (context === undefined) {
-    throw new Error('useWritingContext must be used within a WritingProvider');
-  }
-  return context;
-};
+}

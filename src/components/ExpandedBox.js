@@ -1,15 +1,13 @@
-import { useEffect, useState, useRef } from 'react';
-import { ref, onValue, set, get } from 'firebase/database';
+import React, { useEffect, useState } from 'react';
+import { ref, onValue, set } from 'firebase/database';
 import { database } from '../firebase';
 import { Editor, EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
-import { FiLink, FiEdit, FiSave, FiBold, FiItalic, FiList, FiMaximize2, FiCode } from 'react-icons/fi';
+import { FiLink, FiX, FiSave, FiBold, FiItalic, FiList, FiCode } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-import ExpandedBox from './ExpandedBox';
-import styles from './WritingBox.module.css';
 
-const MenuBar=({editor})=>{
+const ExpandedMenuBar=({editor})=>{
   const [linkUrl, setLinkUrl]=useState('');
   const [showLinkInput, setShowLinkInput]=useState(false);
   
@@ -34,34 +32,34 @@ const MenuBar=({editor})=>{
   };
   
   return (
-    <div className="flex flex-wrap items-center gap-1 p-1 mb-2 bg-gray-100 dark:bg-gray-800 rounded-md">
+    <div className="flex flex-wrap items-center gap-2 p-2 mb-4 bg-gray-100 dark:bg-gray-800 rounded-md">
       <button
         onClick={()=>editor.chain().focus().toggleBold().run()}
         className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${editor.isActive('bold')?'bg-gray-300 dark:bg-gray-700':''}`}
         title="Bold"
       >
-        <FiBold size={16}/>
+        <FiBold size={18}/>
       </button>
       <button
         onClick={()=>editor.chain().focus().toggleItalic().run()}
         className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${editor.isActive('italic')?'bg-gray-300 dark:bg-gray-700':''}`}
         title="Italic"
       >
-        <FiItalic size={16}/>
+        <FiItalic size={18}/>
       </button>
       <button
         onClick={()=>editor.chain().focus().toggleBulletList().run()}
         className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${editor.isActive('bulletList')?'bg-gray-300 dark:bg-gray-700':''}`}
         title="Bullet List"
       >
-        <FiList size={16}/>
+        <FiList size={18}/>
       </button>
       <button
         onClick={()=>editor.chain().focus().toggleCodeBlock().run()}
         className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${editor.isActive('codeBlock')?'bg-gray-300 dark:bg-gray-700':''}`}
         title="Code Block"
       >
-        <FiCode size={16}/>
+        <FiCode size={18}/>
       </button>
       <div className="relative ml-auto">
         <button
@@ -69,21 +67,21 @@ const MenuBar=({editor})=>{
           className={`p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 ${editor.isActive('link')?'bg-gray-300 dark:bg-gray-700':''}`}
           title="Add Link"
         >
-          <FiLink size={16}/>
+          <FiLink size={18}/>
         </button>
         {showLinkInput&&(
-          <div className="absolute right-0 mt-1 p-2 bg-white dark:bg-gray-800 rounded shadow-lg z-10 flex">
+          <div className="absolute right-0 mt-1 p-3 bg-white dark:bg-gray-800 rounded shadow-lg z-10 flex">
             <input
               type="text"
               value={linkUrl}
               onChange={(e)=>setLinkUrl(e.target.value)}
               placeholder="https://example.com"
-              className="px-2 py-1 text-sm w-40 border dark:border-gray-600 rounded dark:bg-gray-700"
+              className="px-3 py-2 text-sm w-64 border dark:border-gray-600 rounded dark:bg-gray-700"
               onKeyDown={(e)=>e.key==='Enter'&&setLink()}
             />
             <button
               onClick={setLink}
-              className="ml-2 px-2 py-1 bg-primary-500 text-white rounded text-sm"
+              className="ml-2 px-3 py-2 bg-primary-500 text-white rounded text-sm"
             >
               Set
             </button>
@@ -94,23 +92,19 @@ const MenuBar=({editor})=>{
   );
 };
 
-const WritingBox = ({ boxNumber, onExpand }) => {
-  const [content, setContent] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
-  const [lastEditor, setLastEditor] = useState(null);
-  const [lastEditTime, setLastEditTime] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [username, setUsername] = useState('Anonymous');
-  const boxRef = useRef(null);
+const ExpandedBox = ({ boxNumber, onClose }) => {
+    const [content, setContent] = useState('');
+    const [lastEditor, setLastEditor] = useState(null);
+    const [lastEditTime, setLastEditTime] = useState(null);
+    const [username, setUsername] = useState('Anonymous');
 
-  useEffect(() => {
-    // Client-side only code
-    if (typeof window !== 'undefined') {
-      setUsername(localStorage.getItem('username') || 'Anonymous');
-    }
-  }, []);
-  
-  const editor=useEditor({
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+          setUsername(localStorage.getItem('username') || 'Anonymous');
+        }
+      }, []);
+
+    const editor=useEditor({
     extensions:[
       StarterKit,
       Link.configure({
@@ -129,7 +123,7 @@ const WritingBox = ({ boxNumber, onExpand }) => {
     },
     editorProps:{
       attributes:{
-        class:'prose dark:prose-invert max-w-none focus:outline-none p-3',
+        class:'prose dark:prose-invert max-w-none focus:outline-none min-h-[300px] p-4',
       },
     },
   });
@@ -157,24 +151,6 @@ const WritingBox = ({ boxNumber, onExpand }) => {
       }
     };
     
-    const localText=localStorage.getItem(`boxText_${boxNumber}`);
-    if (localText) {
-      try {
-        const parsed=JSON.parse(localText);
-        setContent(safeDecodeContent(parsed.content||localText));
-        setLastEditor(parsed.lastEditor||'Anonymous');
-        setLastEditTime(parsed.lastEditTime||null);
-        if (editor) {
-          editor.commands.setContent(safeDecodeContent(parsed.content||localText));
-        }
-      } catch (e) {
-        setContent(safeDecodeContent(localText));
-        if (editor) {
-          editor.commands.setContent(safeDecodeContent(localText));
-        }
-      }
-    }
-    
     const contentUnsubscribe=onValue(boxDbRef, updateContent);
     const metaUnsubscribe=onValue(metaDbRef, updateMeta);
     
@@ -188,8 +164,7 @@ const WritingBox = ({ boxNumber, onExpand }) => {
     if (!editor) return;
     const newContent = editor.getHTML();
     
-    // Client-side check
-    const username = typeof window !== 'undefined' 
+    const username = typeof window !== 'undefined'
       ? localStorage.getItem('username') || 'Anonymous'
       : 'Anonymous';
 
@@ -200,7 +175,6 @@ const WritingBox = ({ boxNumber, onExpand }) => {
     const metadata = {
       lastEditor: username,
       lastEditTime: new Date().toISOString(),
-      content: encodedContent
     };
 
     set(contentRef, encodedContent);
@@ -210,86 +184,58 @@ const WritingBox = ({ boxNumber, onExpand }) => {
     });
 
     if (typeof window !== 'undefined') {
-      localStorage.setItem(`boxText_${boxNumber}`, JSON.stringify(metadata));
-    }
-    setIsEditing(false);
-    
-    set(contentRef, encodedContent);
-    set(metaRef, {
-      lastEditor:metadata.lastEditor,
-      lastEditTime:metadata.lastEditTime
-    });
-  };
-  
-  const handleExpand=()=>{
-    setIsExpanded(true);
-    if (onExpand) {
-      onExpand(boxNumber);
+      localStorage.setItem(`boxText_${boxNumber}`, JSON.stringify({
+        content: encodedContent,
+        lastEditor: metadata.lastEditor,
+        lastEditTime: metadata.lastEditTime
+      }));
     }
   };
+
   
   return (
-    <>
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+      initial={{ opacity:0}}
+      animate={{ opacity:1}}
+      exit={{ opacity:0}}
+    >
       <motion.div
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all overflow-hidden flex flex-col h-[280px]" // Fixed height
-        whileHover={{ y:-5}}
-        initial={{ opacity:0, y:20}}
-        animate={{ opacity:1, y:0}}
-        transition={{ duration:0.3}}
-        ref={boxRef}
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl flex flex-col max-h-[90vh]"
+        initial={{ scale:0.9, opacity:0}}
+        animate={{ scale:1, opacity:1}}
+        transition={{ type:'spring', damping:25, stiffness:300}}
       >
-        <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 border-b dark:border-gray-700">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Pied {boxNumber+1}</h3>
+        <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+            Pied {boxNumber+1}
+          </h2>
           <div className="flex items-center gap-2">
-            {!isEditing?(
-              <>
-                <button
-                  onClick={()=>setIsEditing(true)}
-                  className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
-                  aria-label="Edit content"
-                  title="Edit content"
-                >
-                  <FiEdit size={14}/>
-                </button>
-                <button
-                  onClick={handleExpand}
-                  className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
-                  aria-label="Expand box"
-                  title="Expand box"
-                >
-                  <FiMaximize2 size={14}/>
-                </button>
-              </>
-            ):(
-              <button
-                onClick={saveContent}
-                className="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-primary-500 dark:text-primary-400"
-                aria-label="Save changes"
-                title="Save changes"
-              >
-                <FiSave size={14}/>
-              </button>
-            )}
+            <button
+              onClick={saveContent}
+              className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-primary-500 dark:text-primary-400"
+              title="Save changes"
+            >
+              <FiSave size={20}/>
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
+              title="Close"
+            >
+              <FiX size={20}/>
+            </button>
           </div>
         </div>
-        <div className="relative flex-grow overflow-auto"> {/* This ensures content is scrollable */}
-        {isEditing ? (
-          <div className={styles.editorContainer + " scrollStyle"}>
-            <MenuBar editor={editor} />
-            <EditorContent
-              editor={editor}
-              className={styles.writingBox}
-            />
-          </div>
-        ) : (
-          <div
-            className={styles.contentPreview + " scrollStyle " + styles.writingBox}
-            dangerouslySetInnerHTML={{ __html: content }}
+        <div className="flex-grow overflow-auto p-4">
+          <ExpandedMenuBar editor={editor}/>
+          <EditorContent
+            editor={editor}
+            className="min-h-[400px] border dark:border-gray-700 rounded-md"
           />
-        )}
         </div>
         {lastEditor&&(
-          <div className="text-xs text-gray-500 dark:text-gray-400 p-2 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+          <div className="text-sm text-gray-500 dark:text-gray-400 p-3 border-t dark:border-gray-700">
             Last edited by: {lastEditor} {lastEditTime&&(
               <span title={new Date(lastEditTime).toLocaleString()}>
                 • {formatTimeAgo(lastEditTime)}
@@ -298,17 +244,11 @@ const WritingBox = ({ boxNumber, onExpand }) => {
           </div>
         )}
       </motion.div>
-      {isExpanded&&(
-        <ExpandedBox
-          boxNumber={boxNumber}
-          onClose={()=>setIsExpanded(false)}
-        />
-      )}
-    </>
+    </motion.div>
   );
 };
 
-export default WritingBox;
+export default ExpandedBox;
 
 const safeEncodeContent=(content)=>{
   try {
